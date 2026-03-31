@@ -1,0 +1,59 @@
+version: "3.9"
+
+# =============================================================================
+# LLM API Monetization Proxy — Docker Compose
+#
+# Usage:
+#   cp .env.example .env       # fill in your keys
+#   docker compose up          # start the proxy
+#   curl http://localhost:8000/health
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Proxy service
+  # ---------------------------------------------------------------------------
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: llm-api-monetization:latest
+    container_name: llm-api-proxy
+    restart: unless-stopped
+    ports:
+      - "${PORT:-8000}:8000"
+    env_file:
+      - .env
+    environment:
+      # Override specific env vars here if needed
+      LOG_LEVEL: "${LOG_LEVEL:-INFO}"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - proxy-net
+
+  # ---------------------------------------------------------------------------
+  # Redis (optional — for production usage persistence)
+  # Uncomment if you replace the in-memory _usage_store with Redis.
+  # ---------------------------------------------------------------------------
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: llm-proxy-redis
+  #   restart: unless-stopped
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+  #   networks:
+  #     - proxy-net
+
+networks:
+  proxy-net:
+    driver: bridge
+
+# volumes:
+#   redis_data:
