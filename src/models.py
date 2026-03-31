@@ -1,7 +1,10 @@
-"""
-Pydantic models for OpenAI-compatible request/response structures.
+"""Pydantic models for OpenAI-compatible request/response structures.
+
 These models allow the LLM API monetization proxy to serve as a drop-in
 replacement for the OpenAI API while adding Mainlayer billing.
+
+The proxy is designed to be 100% compatible with the OpenAI Chat Completions API,
+with the addition of the X-Payer-Wallet header for billing identification.
 """
 
 from __future__ import annotations
@@ -43,14 +46,20 @@ class ChatMessage(BaseModel):
 
 
 class ChatRequest(BaseModel):
+    """OpenAI-compatible chat completion request.
+
+    This model is fully compatible with the OpenAI Chat Completions API.
+    Additional header required: X-Payer-Wallet (for Mainlayer billing).
+    """
+
     model: str = Field(default="gpt-4o-mini", description="Model identifier")
-    messages: List[ChatMessage]
-    temperature: Optional[float] = Field(default=None, ge=0.0, le=2.0)
-    top_p: Optional[float] = Field(default=None, ge=0.0, le=1.0)
-    n: Optional[int] = Field(default=1, ge=1, le=10)
-    stream: Optional[bool] = False
-    stop: Optional[Union[str, List[str]]] = None
-    max_tokens: Optional[int] = Field(default=None, ge=1)
+    messages: List[ChatMessage] = Field(description="Conversation messages")
+    temperature: Optional[float] = Field(default=None, ge=0.0, le=2.0, description="Sampling temperature (0-2)")
+    top_p: Optional[float] = Field(default=None, ge=0.0, le=1.0, description="Nucleus sampling parameter")
+    n: Optional[int] = Field(default=1, ge=1, le=10, description="Number of completions to generate")
+    stream: Optional[bool] = Field(False, description="Return response as a stream")
+    stop: Optional[Union[str, List[str]]] = Field(None, description="Stop sequences")
+    max_tokens: Optional[int] = Field(default=None, ge=1, description="Maximum tokens in response")
     presence_penalty: Optional[float] = Field(default=None, ge=-2.0, le=2.0)
     frequency_penalty: Optional[float] = Field(default=None, ge=-2.0, le=2.0)
     logit_bias: Optional[Dict[str, float]] = None

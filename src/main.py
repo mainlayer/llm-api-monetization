@@ -1,22 +1,28 @@
-"""
-LLM API Monetization Proxy — powered by Mainlayer.
+"""LLM API Monetization Proxy — powered by Mainlayer.
 
 This FastAPI application sits in front of any OpenAI-compatible LLM API and
-adds per-token billing via Mainlayer.  Clients send standard OpenAI-format
-requests plus an X-Payer-Wallet header.  The proxy:
+adds per-token billing via Mainlayer. It's a drop-in replacement for OpenAI:
 
-  1. Checks Mainlayer to confirm the wallet has credits.
-  2. Forwards the request to the upstream LLM.
-  3. Tracks actual token usage back to Mainlayer.
-  4. Returns the LLM response verbatim (OpenAI-compatible).
+  1. Clients send OpenAI-format requests + X-Payer-Wallet header
+  2. Proxy checks Mainlayer to confirm wallet has credits
+  3. Forwards request to upstream LLM (OpenAI, Groq, Together, Ollama, etc.)
+  4. Tracks actual token usage back to Mainlayer for billing
+  5. Returns LLM response verbatim (100% OpenAI-compatible)
 
-Environment variables (see .env.example):
-  MAINLAYER_API_KEY   — Mainlayer API key
-  MAINLAYER_RESOURCE_ID — unique resource ID registered in Mainlayer
-  LLM_API_KEY         — Upstream LLM API key
-  LLM_BASE_URL        — Upstream base URL (default: https://api.openai.com)
-  LLM_MODEL           — Default model
-  PRICE_PER_1K_TOKENS — USD price per 1,000 tokens (default: 0.01)
+Workflow:
+  - Agent calls proxy with X-Payer-Wallet header
+  - Insufficient credits → return 402 Payment Required with cost estimate
+  - Sufficient credits → charge wallet, forward to upstream, return response
+  - Usage tracked and aggregated for billing
+
+Configuration (see .env.example):
+  MAINLAYER_API_KEY       — Mainlayer API key
+  MAINLAYER_RESOURCE_ID   — Unique resource ID registered in Mainlayer
+  LLM_API_KEY             — Upstream LLM API key
+  LLM_BASE_URL            — Upstream base URL (default: https://api.openai.com)
+  LLM_MODEL               — Default model (default: gpt-4o-mini)
+  PRICE_PER_1K_TOKENS     — USD price per 1,000 tokens (default: 0.01)
+  FAIL_OPEN               — Allow requests if Mainlayer unreachable (default: false)
 """
 
 from __future__ import annotations

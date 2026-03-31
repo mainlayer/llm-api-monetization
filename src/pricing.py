@@ -1,8 +1,14 @@
-"""
-Pricing calculator: converts token counts to USD costs.
+"""Pricing calculator: converts token counts to USD costs.
 
-Default rate: $0.01 per 1,000 tokens (configurable via environment variable).
+Default rate: $0.01 per 1,000 tokens (configurable via PRICE_PER_1K_TOKENS env var).
 All monetary values are expressed in USD.
+
+Key functions:
+- estimate_tokens(): Pre-request estimation for 402 responses
+- tokens_to_usd(): Token count to USD cost conversion
+- calculate_request_price(): Full PricingInfo object for client
+- calculate_actual_cost(): Billing calculation from actual token usage
+- usd_to_credits(): USD to Mainlayer credit units (100 credits = $1 USD)
 """
 
 from __future__ import annotations
@@ -51,18 +57,27 @@ def _count_chars_in_request(request: ChatRequest) -> int:
 # ---------------------------------------------------------------------------
 
 def estimate_tokens(request: ChatRequest) -> int:
-    """
-    Estimate the number of tokens for a request before it is sent upstream.
+    """Estimate the number of tokens for a request before it is sent upstream.
 
     This is used to show pricing information in 402 Payment Required responses.
-    The estimate is intentionally conservative (includes overhead for message
-    formatting, system prompt tokens, and an expected completion buffer).
+    The estimate is intentionally conservative and includes:
+    - Message formatting overhead (~4 tokens per message)
+    - Prompt tokens (4 chars per token approximation)
+    - Expected completion buffer (max_tokens or 256 default)
+    - Minimum charge threshold (MIN_TOKENS_PER_REQUEST)
 
     Args:
-        request: The incoming ChatRequest.
+        request : ChatRequest
+            The incoming OpenAI-format chat completion request.
 
     Returns:
-        Estimated token count as an integer.
+        int
+            Estimated token count (conservative, may exceed actual usage).
+
+    Note:
+        This estimate should be higher than actual usage to ensure adequate
+        client funding. Actual token count (from upstream LLM) is used for
+        final billing.
     """
     char_count = _count_chars_in_request(request)
     prompt_tokens = max(int(char_count / _CHARS_PER_TOKEN), MIN_TOKENS_PER_REQUEST)
