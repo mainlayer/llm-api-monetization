@@ -7,7 +7,7 @@ handles:
   - Recording usage after a request completes
   - Surfacing structured errors when payment is required
 
-Base URL: https://api.mainlayer.xyz
+Base URL: https://api.mainlayer.fr
 Auth:     Authorization: Bearer <MAINLAYER_API_KEY>
 """
 
@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 MAINLAYER_BASE_URL: str = os.getenv(
-    "MAINLAYER_BASE_URL", "https://api.mainlayer.xyz"
+    "MAINLAYER_BASE_URL", "https://api.mainlayer.fr"
 ).rstrip("/")
 
 MAINLAYER_API_KEY: str = os.getenv("MAINLAYER_API_KEY", "")

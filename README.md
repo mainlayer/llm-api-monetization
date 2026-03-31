@@ -1,6 +1,6 @@
 # LLM API Monetization Proxy
 
-**Monetize any LLM API in minutes.** A drop-in OpenAI-compatible proxy that adds per-token billing via [Mainlayer](https://mainlayer.xyz) — the payment infrastructure for AI agents.
+**Monetize any LLM API in minutes.** A drop-in OpenAI-compatible proxy that adds per-token billing via [Mainlayer](https://mainlayer.fr) — the payment infrastructure for AI agents.
 
 ---
 
@@ -110,7 +110,7 @@ curl http://localhost:8000/v1/chat/completions \
       "cost_usd": 0.0012,
       "price_per_1k_tokens_usd": 0.01
     },
-    "pay_endpoint": "https://api.mainlayer.xyz/pay",
+    "pay_endpoint": "https://api.mainlayer.fr/pay",
     "message": "Insufficient credits. Fund your Mainlayer wallet to continue."
   }
 }
@@ -138,7 +138,7 @@ AI agents integrate with Mainlayer using the standard flow:
 1. **Agent calls the proxy** with its wallet address in the `X-Payer-Wallet` header.
 2. **If credits are sufficient**, the request goes through and tokens are deducted.
 3. **If credits are low**, the proxy returns `402 Payment Required` with a structured `pay_endpoint` and cost estimate.
-4. **The agent calls `https://api.mainlayer.xyz/pay`** to top up its wallet.
+4. **The agent calls `https://api.mainlayer.fr/pay`** to top up its wallet.
 5. **Agent retries** — the next call succeeds.
 
 No human in the loop. Fully automated billing for agentic workflows.
@@ -222,7 +222,7 @@ Any OpenAI-compatible API works:
 |----------|----------|---------|-------------|
 | `MAINLAYER_API_KEY` | Yes | — | Mainlayer API key |
 | `MAINLAYER_RESOURCE_ID` | Yes | `llm-api-default` | Resource ID from Mainlayer dashboard |
-| `MAINLAYER_BASE_URL` | No | `https://api.mainlayer.xyz` | Mainlayer API base URL |
+| `MAINLAYER_BASE_URL` | No | `https://api.mainlayer.fr` | Mainlayer API base URL |
 | `LLM_API_KEY` | Yes | — | Upstream LLM API key |
 | `LLM_BASE_URL` | No | `https://api.openai.com` | Upstream API base URL |
 | `LLM_MODEL` | No | `gpt-4o-mini` | Default model |

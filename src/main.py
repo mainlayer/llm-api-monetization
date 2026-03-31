@@ -60,7 +60,7 @@ logger = logging.getLogger(__name__)
 VERSION = "1.0.0"
 
 RESOURCE_ID: str = os.getenv("MAINLAYER_RESOURCE_ID", "llm-api-default")
-PAY_ENDPOINT: str = "https://api.mainlayer.xyz/pay"
+PAY_ENDPOINT: str = "https://api.mainlayer.fr/pay"
 
 # Whether to fail open (allow requests) if Mainlayer is unreachable.
 # Set FAIL_OPEN=true in dev; keep false (fail closed) in production.

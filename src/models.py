@@ -134,7 +134,7 @@ class PaymentRequiredDetail(BaseModel):
     error: str = "payment_required"
     resource_id: str
     pricing: PricingInfo
-    pay_endpoint: str = "https://api.mainlayer.xyz/pay"
+    pay_endpoint: str = "https://api.mainlayer.fr/pay"
     message: str = (
         "Insufficient credits. Fund your Mainlayer wallet to continue."
     )

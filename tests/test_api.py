@@ -404,7 +404,7 @@ class TestChatCompletions:
         )
 
         detail = response.json()["detail"]
-        assert detail["pay_endpoint"] == "https://api.mainlayer.xyz/pay"
+        assert detail["pay_endpoint"] == "https://api.mainlayer.fr/pay"
 
 
 class TestUsageSummaryEndpoint:
